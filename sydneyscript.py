@@ -31,7 +31,9 @@ class Error:
     def as_string(self):
         result = f'{self.error_name}: {self.details}\n'
         result += f'File {self.pos_start.fn}, line {self.pos_start.ln + 1}'
-        result += '\n\n' + string_with_arrows(self.pos_start.ftxt, self.pos_start, self.pos_end)
+        result += '\n\n' + \
+            string_with_arrows(self.pos_start.ftxt,
+                               self.pos_start, self.pos_end)
         return result
 
 
@@ -58,7 +60,9 @@ class RTError(Error):
     def as_string(self):
         result = self.generate_traceback()
         result += f'{self.error_name}: {self.details}'
-        result += '\n\n' + string_with_arrows(self.pos_start.ftxt, self.pos_start, self.pos_end)
+        result += '\n\n' + \
+            string_with_arrows(self.pos_start.ftxt,
+                               self.pos_start, self.pos_end)
         return result
 
     def generate_traceback(self):
@@ -67,7 +71,7 @@ class RTError(Error):
         ctx = self.context
 
         while ctx:
-            result = f'  File {pos.fn}, line {str(pos.ln + 1)}, in {ctx.display_name}\n' + result
+            result = f'  File {pos.fn}, line {str(pos.ln + 1)}, in {ctx.displTO_name}\n' + result
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 
@@ -134,19 +138,19 @@ KEYWORDS = [
     'BOWL',  # CONST
     'AND',  # AND
     'OR',  # OR
-    'NOTHAPPY',  # NOT
-    'DOUBT',  # IF
+    'FLIP',  # NOT
+    'DEBATE',  # IF
     'TOLDYOU',  # ELSEIF
-    'BORING',  # ELSE
-    'FOR',  # FOR
-    'AY',  # TO
-    'STEP',  # STEP
+    'LASTCHANCE',  # ELSE
+    'PARADOX',  # FOR
+    'TO',  # TO
+    'YEET',  # STEP
     'SINCE',  # WHILE
-    'FUNKY',  # FUN
+    'FUNKY',  # FUN (function)
     'SOWHAT',  # THEN
-    'SAD',  # END
+    'YUMYUM',  # END
     'PASS',  # RETURN
-    'EVERYTHINGISGONNABEOKAY',  # CONTINUE
+    'EVERYTHINGISGONNABEOKTO',  # CONTINUE
     'DOOMED',  # BREAK
 ]
 
@@ -168,7 +172,8 @@ class Token:
         return self.type == type_ and self.value == value
 
     def __repr__(self):
-        if self.value: return f'{self.type}:{self.value}'
+        if self.value:
+            return f'{self.type}:{self.value}'
         return f'{self.type}'
 
 
@@ -186,7 +191,8 @@ class Lexer:
 
     def advance(self):
         self.pos.advance(self.current_char)
-        self.current_char = self.text[self.pos.idx] if self.pos.idx < len(self.text) else None
+        self.current_char = self.text[self.pos.idx] if self.pos.idx < len(
+            self.text) else None
 
     def make_tokens(self):
         tokens = []
@@ -233,7 +239,8 @@ class Lexer:
                 self.advance()
             elif self.current_char == '!':
                 token, error = self.make_not_equals()
-                if error: return [], error
+                if error:
+                    return [], error
                 tokens.append(token)
             elif self.current_char == '=':
                 tokens.append(self.make_equals())
@@ -260,7 +267,8 @@ class Lexer:
 
         while self.current_char != None and self.current_char in DIGITS + '.':
             if self.current_char == '.':
-                if dot_count == 1: break
+                if dot_count == 1:
+                    break
                 dot_count += 1
             num_str += self.current_char
             self.advance()
@@ -283,7 +291,8 @@ class Lexer:
 
         while self.current_char != None and (self.current_char != '"' or escape_character):
             if escape_character:
-                string += escape_characters.get(self.current_char, self.current_char)
+                string += escape_characters.get(self.current_char,
+                                                self.current_char)
             else:
                 if self.current_char == '\\':
                     escape_character = True
@@ -452,7 +461,8 @@ class IfNode:
         self.else_case = else_case
 
         self.pos_start = self.cases[0][0].pos_start
-        self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
+        self.pos_end = (
+            self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
 
 
 class ForNode:
@@ -547,7 +557,8 @@ class ParseResult:
     def register(self, res):
         self.last_registered_advance_count = res.advance_count
         self.advance_count += res.advance_count
-        if res.error: self.error = res.error
+        if res.error:
+            self.error = res.error
         return res.node
 
     def try_register(self, res):
@@ -611,7 +622,8 @@ class Parser:
             self.advance()
 
         statement = res.register(self.statement())
-        if res.error: return res
+        if res.error:
+            return res
         statements.append(statement)
 
         more_statements = True
@@ -625,7 +637,8 @@ class Parser:
             if newline_count == 0:
                 more_statements = False
 
-            if not more_statements: break
+            if not more_statements:
+                break
             statement = res.try_register(self.statement())
             if not statement:
                 self.reverse(res.to_reverse_count)
@@ -652,7 +665,7 @@ class Parser:
                 self.reverse(res.to_reverse_count)
             return res.success(ReturnNode(expr, pos_start, self.current_tok.pos_start.copy()))
 
-        if self.current_tok.matches(TT_KEYWORD, 'EVERYTHINGISGONNABEOKAY'):
+        if self.current_tok.matches(TT_KEYWORD, 'EVERYTHINGISGONNABEOKTO'):
             res.register_advancement()
             self.advance()
             return res.success(ContinueNode(pos_start, self.current_tok.pos_start.copy()))
@@ -666,7 +679,7 @@ class Parser:
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'PASS', 'EVERYTHINGISGONNABEOKAY', 'DOOMED', 'BOWL', 'DOUBT', 'FOR', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'NOTHAPPY'"
+                "Expected 'PASS', 'EVERYTHINGISGONNABEOKTO', 'DOOMED', 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
             ))
         return res.success(expr)
 
@@ -696,15 +709,17 @@ class Parser:
             res.register_advancement()
             self.advance()
             expr = res.register(self.expr())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(VarAssignNode(var_name, expr))
 
-        node = res.register(self.bin_op(self.comp_expr, ((TT_KEYWORD, 'AND'), (TT_KEYWORD, 'OR'))))
+        node = res.register(self.bin_op(
+            self.comp_expr, ((TT_KEYWORD, 'AND'), (TT_KEYWORD, 'OR'))))
 
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'BOWL', 'DOUBT', 'FOR', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'NOTHAPPY'"
+                "Expected 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
             ))
 
         return res.success(node)
@@ -712,21 +727,23 @@ class Parser:
     def comp_expr(self):
         res = ParseResult()
 
-        if self.current_tok.matches(TT_KEYWORD, 'NOTHAPPY'):
+        if self.current_tok.matches(TT_KEYWORD, 'FLIP'):
             op_tok = self.current_tok
             res.register_advancement()
             self.advance()
 
             node = res.register(self.comp_expr())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(UnaryOpNode(op_tok, node))
 
-        node = res.register(self.bin_op(self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE)))
+        node = res.register(self.bin_op(
+            self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE)))
 
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected int, float, identifier, '+', '-', '(', '[', 'DOUBT', 'FOR', 'SINCE', 'FUNKY' or 'NOTHAPPY'"
+                "Expected int, float, identifier, '+', '-', '(', '[', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY' or 'FLIP'"
             ))
 
         return res.success(node)
@@ -745,7 +762,8 @@ class Parser:
             res.register_advancement()
             self.advance()
             factor = res.register(self.factor())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(UnaryOpNode(tok, factor))
 
         return self.power()
@@ -756,7 +774,8 @@ class Parser:
     def call(self):
         res = ParseResult()
         atom = res.register(self.atom())
-        if res.error: return res
+        if res.error:
+            return res
 
         if self.current_tok.type == TT_LPAREN:
             res.register_advancement()
@@ -771,7 +790,7 @@ class Parser:
                 if res.error:
                     return res.failure(InvalidSyntaxError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected ')', 'BOWL', 'DOUBT', 'FOR', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'NOTHAPPY'"
+                        "Expected ')', 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
                     ))
 
                 while self.current_tok.type == TT_COMMA:
@@ -779,7 +798,8 @@ class Parser:
                     self.advance()
 
                     arg_nodes.append(res.register(self.expr()))
-                    if res.error: return res
+                    if res.error:
+                        return res
 
                 if self.current_tok.type != TT_RPAREN:
                     return res.failure(InvalidSyntaxError(
@@ -815,7 +835,8 @@ class Parser:
             res.register_advancement()
             self.advance()
             expr = res.register(self.expr())
-            if res.error: return res
+            if res.error:
+                return res
             if self.current_tok.type == TT_RPAREN:
                 res.register_advancement()
                 self.advance()
@@ -828,32 +849,37 @@ class Parser:
 
         elif tok.type == TT_LSQUARE:
             list_expr = res.register(self.list_expr())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(list_expr)
 
-        elif tok.matches(TT_KEYWORD, 'DOUBT'):
+        elif tok.matches(TT_KEYWORD, 'DEBATE'):
             if_expr = res.register(self.if_expr())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(if_expr)
 
-        elif tok.matches(TT_KEYWORD, 'FOR'):
+        elif tok.matches(TT_KEYWORD, 'PARADOX'):
             for_expr = res.register(self.for_expr())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(for_expr)
 
         elif tok.matches(TT_KEYWORD, 'SINCE'):
             while_expr = res.register(self.while_expr())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(while_expr)
 
         elif tok.matches(TT_KEYWORD, 'FUNKY'):
             func_def = res.register(self.func_def())
-            if res.error: return res
+            if res.error:
+                return res
             return res.success(func_def)
 
         return res.failure(InvalidSyntaxError(
             tok.pos_start, tok.pos_end,
-            "Expected int, float, identifier, '+', '-', '(', '[', IF', 'FOR', 'SINCE', 'FUNKY'"
+            "Expected int, float, identifier, '+', '-', '(', '[', IF', 'PARADOX', 'SINCE', 'FUNKY'"
         ))
 
     def list_expr(self):
@@ -878,7 +904,7 @@ class Parser:
             if res.error:
                 return res.failure(InvalidSyntaxError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected ']', 'BOWL', 'DOUBT', 'FOR', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'NOTHAPPY'"
+                    "Expected ']', 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
                 ))
 
             while self.current_tok.type == TT_COMMA:
@@ -886,7 +912,8 @@ class Parser:
                 self.advance()
 
                 element_nodes.append(res.register(self.expr()))
-                if res.error: return res
+                if res.error:
+                    return res
 
             if self.current_tok.type != TT_RSQUARE:
                 return res.failure(InvalidSyntaxError(
@@ -905,8 +932,9 @@ class Parser:
 
     def if_expr(self):
         res = ParseResult()
-        all_cases = res.register(self.if_expr_cases('DOUBT'))
-        if res.error: return res
+        all_cases = res.register(self.if_expr_cases('DEBATE'))
+        if res.error:
+            return res
         cases, else_case = all_cases
         return res.success(IfNode(cases, else_case))
 
@@ -917,7 +945,7 @@ class Parser:
         res = ParseResult()
         else_case = None
 
-        if self.current_tok.matches(TT_KEYWORD, 'BORING'):
+        if self.current_tok.matches(TT_KEYWORD, 'LASTCHANCE'):
             res.register_advancement()
             self.advance()
 
@@ -926,20 +954,22 @@ class Parser:
                 self.advance()
 
                 statements = res.register(self.statements())
-                if res.error: return res
+                if res.error:
+                    return res
                 else_case = (statements, True)
 
-                if self.current_tok.matches(TT_KEYWORD, 'SAD'):
+                if self.current_tok.matches(TT_KEYWORD, 'YUMYUM'):
                     res.register_advancement()
                     self.advance()
                 else:
                     return res.failure(InvalidSyntaxError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected 'SAD'"
+                        "Expected 'YUMYUM'"
                     ))
             else:
                 expr = res.register(self.statement())
-                if res.error: return res
+                if res.error:
+                    return res
                 else_case = (expr, False)
 
         return res.success(else_case)
@@ -950,11 +980,13 @@ class Parser:
 
         if self.current_tok.matches(TT_KEYWORD, 'TOLDYOU'):
             all_cases = res.register(self.if_expr_b())
-            if res.error: return res
+            if res.error:
+                return res
             cases, else_case = all_cases
         else:
             else_case = res.register(self.if_expr_c())
-            if res.error: return res
+            if res.error:
+                return res
 
         return res.success((cases, else_case))
 
@@ -973,7 +1005,8 @@ class Parser:
         self.advance()
 
         condition = res.register(self.expr())
-        if res.error: return res
+        if res.error:
+            return res
 
         if not self.current_tok.matches(TT_KEYWORD, 'SOWHAT'):
             return res.failure(InvalidSyntaxError(
@@ -989,24 +1022,28 @@ class Parser:
             self.advance()
 
             statements = res.register(self.statements())
-            if res.error: return res
+            if res.error:
+                return res
             cases.append((condition, statements, True))
 
-            if self.current_tok.matches(TT_KEYWORD, 'SAD'):
+            if self.current_tok.matches(TT_KEYWORD, 'YUMYUM'):
                 res.register_advancement()
                 self.advance()
             else:
                 all_cases = res.register(self.if_expr_b_or_c())
-                if res.error: return res
+                if res.error:
+                    return res
                 new_cases, else_case = all_cases
                 cases.extend(new_cases)
         else:
             expr = res.register(self.statement())
-            if res.error: return res
+            if res.error:
+                return res
             cases.append((condition, expr, False))
 
             all_cases = res.register(self.if_expr_b_or_c())
-            if res.error: return res
+            if res.error:
+                return res
             new_cases, else_case = all_cases
             cases.extend(new_cases)
 
@@ -1015,10 +1052,10 @@ class Parser:
     def for_expr(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'FOR'):
+        if not self.current_tok.matches(TT_KEYWORD, 'PARADOX'):
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'FOR'"
+                f"Expected 'PARADOX'"
             ))
 
         res.register_advancement()
@@ -1044,26 +1081,29 @@ class Parser:
         self.advance()
 
         start_value = res.register(self.expr())
-        if res.error: return res
+        if res.error:
+            return res
 
-        if not self.current_tok.matches(TT_KEYWORD, 'AY'):
+        if not self.current_tok.matches(TT_KEYWORD, 'TO'):
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'AY'"
+                f"Expected 'TO'"
             ))
 
         res.register_advancement()
         self.advance()
 
         end_value = res.register(self.expr())
-        if res.error: return res
+        if res.error:
+            return res
 
-        if self.current_tok.matches(TT_KEYWORD, 'STEP'):
+        if self.current_tok.matches(TT_KEYWORD, 'YEET'):
             res.register_advancement()
             self.advance()
 
             step_value = res.register(self.expr())
-            if res.error: return res
+            if res.error:
+                return res
         else:
             step_value = None
 
@@ -1081,12 +1121,13 @@ class Parser:
             self.advance()
 
             body = res.register(self.statements())
-            if res.error: return res
+            if res.error:
+                return res
 
-            if not self.current_tok.matches(TT_KEYWORD, 'SAD'):
+            if not self.current_tok.matches(TT_KEYWORD, 'YUMYUM'):
                 return res.failure(InvalidSyntaxError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected 'SAD'"
+                    f"Expected 'YUMYUM'"
                 ))
 
             res.register_advancement()
@@ -1095,7 +1136,8 @@ class Parser:
             return res.success(ForNode(var_name, start_value, end_value, step_value, body, True))
 
         body = res.register(self.statement())
-        if res.error: return res
+        if res.error:
+            return res
 
         return res.success(ForNode(var_name, start_value, end_value, step_value, body, False))
 
@@ -1112,7 +1154,8 @@ class Parser:
         self.advance()
 
         condition = res.register(self.expr())
-        if res.error: return res
+        if res.error:
+            return res
 
         if not self.current_tok.matches(TT_KEYWORD, 'SOWHAT'):
             return res.failure(InvalidSyntaxError(
@@ -1128,12 +1171,13 @@ class Parser:
             self.advance()
 
             body = res.register(self.statements())
-            if res.error: return res
+            if res.error:
+                return res
 
-            if not self.current_tok.matches(TT_KEYWORD, 'SAD'):
+            if not self.current_tok.matches(TT_KEYWORD, 'YUMYUM'):
                 return res.failure(InvalidSyntaxError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected 'SAD'"
+                    f"Expected 'YUMYUM'"
                 ))
 
             res.register_advancement()
@@ -1142,7 +1186,8 @@ class Parser:
             return res.success(WhileNode(condition, body, True))
 
         body = res.register(self.statement())
-        if res.error: return res
+        if res.error:
+            return res
 
         return res.success(WhileNode(condition, body, False))
 
@@ -1218,7 +1263,8 @@ class Parser:
             self.advance()
 
             body = res.register(self.expr())
-            if res.error: return res
+            if res.error:
+                return res
 
             return res.success(FuncDefNode(
                 var_name_tok,
@@ -1237,12 +1283,13 @@ class Parser:
         self.advance()
 
         body = res.register(self.statements())
-        if res.error: return res
+        if res.error:
+            return res
 
-        if not self.current_tok.matches(TT_KEYWORD, 'SAD'):
+        if not self.current_tok.matches(TT_KEYWORD, 'YUMYUM'):
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'SAD'"
+                f"Expected 'YUMYUM'"
             ))
 
         res.register_advancement()
@@ -1263,14 +1310,16 @@ class Parser:
 
         res = ParseResult()
         left = res.register(func_a())
-        if res.error: return res
+        if res.error:
+            return res
 
         while self.current_tok.type in ops or (self.current_tok.type, self.current_tok.value) in ops:
             op_tok = self.current_tok
             res.register_advancement()
             self.advance()
             right = res.register(func_b())
-            if res.error: return res
+            if res.error:
+                return res
             left = BinOpNode(left, op_tok, right)
 
         return res.success(left)
@@ -1326,10 +1375,10 @@ class RTResult:
     def should_return(self):
         # Note: this will allow you to continue and break outside the current function
         return (
-                self.error or
-                self.func_return_value or
-                self.loop_should_continue or
-                self.loop_should_break
+            self.error or
+            self.func_return_value or
+            self.loop_should_continue or
+            self.loop_should_break
         )
 
 
@@ -1403,7 +1452,8 @@ class Value:
         return False
 
     def illegal_operation(self, other=None):
-        if not other: other = self
+        if not other:
+            other = self
         return RTError(
             self.pos_start, other.pos_end,
             'Illegal operation',
@@ -1657,7 +1707,8 @@ class BaseFunction(Value):
     def check_and_populate_args(self, arg_names, args, exec_ctx):
         res = RTResult()
         res.register(self.check_args(arg_names, args))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
         self.populate_args(arg_names, args, exec_ctx)
         return res.success(None)
 
@@ -1674,17 +1725,22 @@ class Function(BaseFunction):
         interpreter = Interpreter()
         exec_ctx = self.generate_new_context()
 
-        res.register(self.check_and_populate_args(self.arg_names, args, exec_ctx))
-        if res.should_return(): return res
+        res.register(self.check_and_populate_args(
+            self.arg_names, args, exec_ctx))
+        if res.should_return():
+            return res
 
         value = res.register(interpreter.visit(self.body_node, exec_ctx))
-        if res.should_return() and res.func_return_value == None: return res
+        if res.should_return() and res.func_return_value == None:
+            return res
 
-        ret_value = (value if self.should_auto_return else None) or res.func_return_value or Number.null
+        ret_value = (
+            value if self.should_auto_return else None) or res.func_return_value or Number.null
         return res.success(ret_value)
 
     def copy(self):
-        copy = Function(self.name, self.body_node, self.arg_names, self.should_auto_return)
+        copy = Function(self.name, self.body_node,
+                        self.arg_names, self.should_auto_return)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
         return copy
@@ -1704,11 +1760,14 @@ class BuiltInFunction(BaseFunction):
         method_name = f'execute_{self.name}'
         method = getattr(self, method_name, self.no_visit_method)
 
-        res.register(self.check_and_populate_args(method.arg_names, args, exec_ctx))
-        if res.should_return(): return res
+        res.register(self.check_and_populate_args(
+            method.arg_names, args, exec_ctx))
+        if res.should_return():
+            return res
 
         return_value = res.register(method(exec_ctx))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
         return res.success(return_value)
 
     def no_visit_method(self, node, context):
@@ -1779,7 +1838,8 @@ class BuiltInFunction(BaseFunction):
     execute_is_list.arg_names = ["value"]
 
     def execute_is_function(self, exec_ctx):
-        is_number = isinstance(exec_ctx.symbol_table.get("value"), BaseFunction)
+        is_number = isinstance(
+            exec_ctx.symbol_table.get("value"), BaseFunction)
         return RTResult().success(Number.true if is_number else Number.false)
 
     execute_is_function.arg_names = ["value"]
@@ -1925,8 +1985,8 @@ BuiltInFunction.run = BuiltInFunction("run")
 #######################################
 
 class Context:
-    def __init__(self, display_name, parent=None, parent_entry_pos=None):
-        self.display_name = display_name
+    def __init__(self, displTO_name, parent=None, parent_entry_pos=None):
+        self.displTO_name = displTO_name
         self.parent = parent
         self.parent_entry_pos = parent_entry_pos
         self.symbol_table = None
@@ -1971,12 +2031,14 @@ class Interpreter:
 
     def visit_NumberNode(self, node, context):
         return RTResult().success(
-            Number(node.tok.value).set_context(context).set_pos(node.pos_start, node.pos_end)
+            Number(node.tok.value).set_context(
+                context).set_pos(node.pos_start, node.pos_end)
         )
 
     def visit_StringNode(self, node, context):
         return RTResult().success(
-            String(node.tok.value).set_context(context).set_pos(node.pos_start, node.pos_end)
+            String(node.tok.value).set_context(
+                context).set_pos(node.pos_start, node.pos_end)
         )
 
     def visit_ListNode(self, node, context):
@@ -1985,10 +2047,12 @@ class Interpreter:
 
         for element_node in node.element_nodes:
             elements.append(res.register(self.visit(element_node, context)))
-            if res.should_return(): return res
+            if res.should_return():
+                return res
 
         return res.success(
-            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+            List(elements).set_context(context).set_pos(
+                node.pos_start, node.pos_end)
         )
 
     def visit_VarAccessNode(self, node, context):
@@ -2010,7 +2074,8 @@ class Interpreter:
         res = RTResult()
         var_name = node.var_name_tok.value
         value = res.register(self.visit(node.value_node, context))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
 
         context.symbol_table.set(var_name, value)
         return res.success(value)
@@ -2018,9 +2083,11 @@ class Interpreter:
     def visit_BinOpNode(self, node, context):
         res = RTResult()
         left = res.register(self.visit(node.left_node, context))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
         right = res.register(self.visit(node.right_node, context))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
 
         if node.op_tok.type == TT_PLUS:
             result, error = left.added_to(right)
@@ -2057,13 +2124,14 @@ class Interpreter:
     def visit_UnaryOpNode(self, node, context):
         res = RTResult()
         number = res.register(self.visit(node.node, context))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
 
         error = None
 
         if node.op_tok.type == TT_MINUS:
             number, error = number.multed_by(Number(-1))
-        elif node.op_tok.matches(TT_KEYWORD, 'NOTHAPPY'):
+        elif node.op_tok.matches(TT_KEYWORD, 'FLIP'):
             number, error = number.notted()
 
         if error:
@@ -2076,17 +2144,20 @@ class Interpreter:
 
         for condition, expr, should_return_null in node.cases:
             condition_value = res.register(self.visit(condition, context))
-            if res.should_return(): return res
+            if res.should_return():
+                return res
 
             if condition_value.is_true():
                 expr_value = res.register(self.visit(expr, context))
-                if res.should_return(): return res
+                if res.should_return():
+                    return res
                 return res.success(Number.null if should_return_null else expr_value)
 
         if node.else_case:
             expr, should_return_null = node.else_case
             expr_value = res.register(self.visit(expr, context))
-            if res.should_return(): return res
+            if res.should_return():
+                return res
             return res.success(Number.null if should_return_null else expr_value)
 
         return res.success(Number.null)
@@ -2096,30 +2167,35 @@ class Interpreter:
         elements = []
 
         start_value = res.register(self.visit(node.start_value_node, context))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
 
         end_value = res.register(self.visit(node.end_value_node, context))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
 
         if node.step_value_node:
-            step_value = res.register(self.visit(node.step_value_node, context))
-            if res.should_return(): return res
+            step_value = res.register(
+                self.visit(node.step_value_node, context))
+            if res.should_return():
+                return res
         else:
             step_value = Number(1)
 
         i = start_value.value
 
         if step_value.value >= 0:
-            condition = lambda: i < end_value.value
+            def condition(): return i < end_value.value
         else:
-            condition = lambda: i > end_value.value
+            def condition(): return i > end_value.value
 
         while condition():
             context.symbol_table.set(node.var_name_tok.value, Number(i))
             i += step_value.value
 
             value = res.register(self.visit(node.body_node, context))
-            if res.should_return() and res.loop_should_continue == False and res.loop_should_break == False: return res
+            if res.should_return() and res.loop_should_continue == False and res.loop_should_break == False:
+                return res
 
             if res.loop_should_continue:
                 continue
@@ -2131,7 +2207,8 @@ class Interpreter:
 
         return res.success(
             Number.null if node.should_return_null else
-            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+            List(elements).set_context(context).set_pos(
+                node.pos_start, node.pos_end)
         )
 
     def visit_WhileNode(self, node, context):
@@ -2140,13 +2217,15 @@ class Interpreter:
 
         while True:
             condition = res.register(self.visit(node.condition_node, context))
-            if res.should_return(): return res
+            if res.should_return():
+                return res
 
             if not condition.is_true():
                 break
 
             value = res.register(self.visit(node.body_node, context))
-            if res.should_return() and res.loop_should_continue == False and res.loop_should_break == False: return res
+            if res.should_return() and res.loop_should_continue == False and res.loop_should_break == False:
+                return res
 
             if res.loop_should_continue:
                 continue
@@ -2158,7 +2237,8 @@ class Interpreter:
 
         return res.success(
             Number.null if node.should_return_null else
-            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+            List(elements).set_context(context).set_pos(
+                node.pos_start, node.pos_end)
         )
 
     def visit_FuncDefNode(self, node, context):
@@ -2180,16 +2260,20 @@ class Interpreter:
         args = []
 
         value_to_call = res.register(self.visit(node.node_to_call, context))
-        if res.should_return(): return res
+        if res.should_return():
+            return res
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
         for arg_node in node.arg_nodes:
             args.append(res.register(self.visit(arg_node, context)))
-            if res.should_return(): return res
+            if res.should_return():
+                return res
 
         return_value = res.register(value_to_call.execute(args))
-        if res.should_return(): return res
-        return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+        if res.should_return():
+            return res
+        return_value = return_value.copy().set_pos(
+            node.pos_start, node.pos_end).set_context(context)
         return res.success(return_value)
 
     def visit_ReturnNode(self, node, context):
@@ -2197,7 +2281,8 @@ class Interpreter:
 
         if node.node_to_return:
             value = res.register(self.visit(node.node_to_return, context))
-            if res.should_return(): return res
+            if res.should_return():
+                return res
         else:
             value = Number.null
 
@@ -2215,14 +2300,14 @@ class Interpreter:
 #######################################
 
 global_symbol_table = SymbolTable()
-global_symbol_table.set("NODEFENITION", Number.null)
+global_symbol_table.set("VOID", Number.null)
 global_symbol_table.set("HELLNO", Number.false)
 global_symbol_table.set("HELLYEA", Number.true)
 global_symbol_table.set("NERD_NUMBER", Number.math_PI)
 global_symbol_table.set("SHOUT", BuiltInFunction.print)
 global_symbol_table.set("SHOUT_RET", BuiltInFunction.print_ret)
-global_symbol_table.set("NO_INPUT", BuiltInFunction.input)
-global_symbol_table.set("NO_INT", BuiltInFunction.input_int)
+global_symbol_table.set("NO_INPUT", BuiltInFunction.input)  # NO_INPUT?
+global_symbol_table.set("NO_INT", BuiltInFunction.input_int)  # NO_INT?
 global_symbol_table.set("GETRIDOFEVERYTHING", BuiltInFunction.clear)
 global_symbol_table.set("GROE", BuiltInFunction.clear)
 global_symbol_table.set("IS_NUMBER", BuiltInFunction.is_number)
@@ -2240,12 +2325,14 @@ def run(fn, text):
     # Generate tokens
     lexer = Lexer(fn, text)
     tokens, error = lexer.make_tokens()
-    if error: return None, error
+    if error:
+        return None, error
 
     # Generate AST
     parser = Parser(tokens)
     ast = parser.parse()
-    if ast.error: return None, ast.error
+    if ast.error:
+        return None, ast.error
 
     # Run program
     interpreter = Interpreter()
