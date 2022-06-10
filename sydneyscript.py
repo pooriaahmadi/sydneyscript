@@ -150,7 +150,7 @@ KEYWORDS = [
     'SOWHAT',  # THEN
     'YUMYUM',  # END
     'PASS',  # RETURN
-    'EVERYTHINGISGONNABEOKTO',  # CONTINUE
+    'EVERYTHINGISGONNABEFINE',  # CONTINUE
     'DOOMED',  # BREAK
 ]
 
@@ -665,7 +665,7 @@ class Parser:
                 self.reverse(res.to_reverse_count)
             return res.success(ReturnNode(expr, pos_start, self.current_tok.pos_start.copy()))
 
-        if self.current_tok.matches(TT_KEYWORD, 'EVERYTHINGISGONNABEOKTO'):
+        if self.current_tok.matches(TT_KEYWORD, 'EVERYTHINGISGONNABEFINE'):
             res.register_advancement()
             self.advance()
             return res.success(ContinueNode(pos_start, self.current_tok.pos_start.copy()))
@@ -679,7 +679,7 @@ class Parser:
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'PASS', 'EVERYTHINGISGONNABEOKTO', 'DOOMED', 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
+                "Expected 'PASS', 'EVERYTHINGISGONNABEFINE', 'DOOMED', 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
             ))
         return res.success(expr)
 
