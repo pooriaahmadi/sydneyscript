@@ -1,4 +1,4 @@
-import sydneyscript
+import main
 import sys
 
 while True:
@@ -6,7 +6,7 @@ while True:
         if sys.argv[1].split(".")[-1] != "syd":
             print("File not supported.")
             break
-        result, error = sydneyscript.run('<stdin>', f"UWU(\"{sys.argv[1]}\")")
+        result, error = main.run('<stdin>', f"UWU(\"{sys.argv[1]}\")")
         if error:
             print(error.as_string())
         elif result:
@@ -19,7 +19,7 @@ while True:
         text = input('SydneyScript > ')
         if text.strip() == "":
             continue
-        result, error = sydneyscript.run('<stdin>', text)
+        result, error = main.run('<stdin>', text)
 
         if error:
             print(error.as_string())
