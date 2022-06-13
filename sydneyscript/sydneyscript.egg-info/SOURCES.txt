@@ -1,0 +1,9 @@
+LICENSE.rst
+README.md
+setup.cfg
+setup.py
+sydneyscript/sydneyscript.egg-info/PKG-INFO
+sydneyscript/sydneyscript.egg-info/SOURCES.txt
+sydneyscript/sydneyscript.egg-info/dependency_links.txt
+sydneyscript/sydneyscript.egg-info/entry_points.txt
+sydneyscript/sydneyscript.egg-info/top_level.txt

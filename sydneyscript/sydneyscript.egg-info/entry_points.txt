@@ -1,0 +1,2 @@
+[console_scripts]
+sydneyscript = sydneyscript:main

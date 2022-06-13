@@ -1,0 +1,13 @@
+LICENSE.rst
+README.md
+setup.cfg
+setup.py
+sydneyscript/__init__.py
+sydneyscript/main.py
+sydneyscript/strings_with_arrows.py
+sydneyscript/sydneyscript.py
+sydneyscript.egg-info/PKG-INFO
+sydneyscript.egg-info/SOURCES.txt
+sydneyscript.egg-info/dependency_links.txt
+sydneyscript.egg-info/entry_points.txt
+sydneyscript.egg-info/top_level.txt

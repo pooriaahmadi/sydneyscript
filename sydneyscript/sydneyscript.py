@@ -1,4 +1,4 @@
-import main
+from .main import *
 import sys
 
 
@@ -8,7 +8,7 @@ def main():
             if sys.argv[1].split(".")[-1] != "syd":
                 print("File not supported.")
                 break
-            result, error = main.run('<stdin>', f"UWU(\"{sys.argv[1]}\")")
+            result, error = run('<stdin>', f"UWU(\"{sys.argv[1]}\")")
             if error:
                 print(error.as_string())
             elif result:
@@ -21,7 +21,7 @@ def main():
             text = input('SydneyScript > ')
             if text.strip() == "":
                 continue
-            result, error = main.run('<stdin>', text)
+            result, error = run('<stdin>', text)
 
             if error:
                 print(error.as_string())
