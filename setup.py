@@ -8,7 +8,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='sydneyscript',
-    version='0.6.1',
+    version='0.6.2',
     license='MIT',
     author="Pooria Ahmadi",
     author_email='pooriababak444@gmail.com',
