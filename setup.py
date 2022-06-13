@@ -18,6 +18,9 @@ setup(
     keywords='language interpreter sydney script',
     install_requires=[],
     long_description=long_description,
-    long_description_content_type='text/markdown'
+    long_description_content_type='text/markdown',
+    entry_points={
+        'console_scripts': ['src=sydneyscript:main'],
+    },
 
 )
