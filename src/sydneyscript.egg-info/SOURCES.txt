@@ -5,4 +5,5 @@ setup.py
 src/sydneyscript.egg-info/PKG-INFO
 src/sydneyscript.egg-info/SOURCES.txt
 src/sydneyscript.egg-info/dependency_links.txt
+src/sydneyscript.egg-info/entry_points.txt
 src/sydneyscript.egg-info/top_level.txt
