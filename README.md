@@ -94,7 +94,7 @@ BOWL cool_variable = "I'm a cool string variable!"
 #### For Loops
 
 ```javascript
-PARADOX i = 0 to 10 SOWHAT
+PARADOX i = 0 TO 10 SOWHAT
 	SHOUT(i)
 YUMYUM
 ```
@@ -103,7 +103,7 @@ YUMYUM
 
 ```javascript
 FUNKY say_hello(name)
-	pass "Hello " + name
+	YEET "Hello " + name
 YUMYUM
 # OR
 FUNKY say_hello(name) -> "Hello " + name

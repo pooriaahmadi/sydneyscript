@@ -1,15 +1,30 @@
 import sydneyscript
+import sys
 
 while True:
-    text = input('SydneyScript > ')
-    if text.strip() == "":
-        continue
-    result, error = sydneyscript.run('<stdin>', text)
+    if len(sys.argv) > 1:
+        if sys.argv[1].split(".")[-1] != "syd":
+            print("File not supported.")
+            break
+        result, error = sydneyscript.run('<stdin>', f"UWU(\"{sys.argv[1]}\")")
+        if error:
+            print(error.as_string())
+        elif result:
+            if len(result.elements) == 1:
+                print(repr(result.elements[0]))
+            else:
+                print(repr(result))
+        break
+    else:
+        text = input('SydneyScript > ')
+        if text.strip() == "":
+            continue
+        result, error = sydneyscript.run('<stdin>', text)
 
-    if error:
-        print(error.as_string())
-    elif result:
-        if len(result.elements) == 1:
-            print(repr(result.elements[0]))
-        else:
-            print(repr(result))
+        if error:
+            print(error.as_string())
+        elif result:
+            if len(result.elements) == 1:
+                print(repr(result.elements[0]))
+            else:
+                print(repr(result))
