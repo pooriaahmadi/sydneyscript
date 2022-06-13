@@ -137,19 +137,19 @@ TT_EOF = 'EOF'
 KEYWORDS = [
     'BOWL',  # CONST
     'AND',  # AND
-    'OR',  # OR
+    'OAR',  # OR
     'FLIP',  # NOT
     'DEBATE',  # IF
     'TOLDYOU',  # ELSEIF
     'LASTCHANCE',  # ELSE
     'PARADOX',  # FOR
     'TO',  # TO
-    'YEET',  # STEP
+    'STEP',  # STEP
     'SINCE',  # WHILE
     'FUNKY',  # FUN (function)
     'SOWHAT',  # THEN
     'YUMYUM',  # END
-    'PASS',  # RETURN
+    'YEET',  # RETURN
     'EVERYTHINGISGONNABEFINE',  # CONTINUE
     'DOOMED',  # BREAK
 ]
@@ -656,7 +656,7 @@ class Parser:
         res = ParseResult()
         pos_start = self.current_tok.pos_start.copy()
 
-        if self.current_tok.matches(TT_KEYWORD, 'PASS'):
+        if self.current_tok.matches(TT_KEYWORD, 'YEET'):
             res.register_advancement()
             self.advance()
 
@@ -679,7 +679,7 @@ class Parser:
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'PASS', 'EVERYTHINGISGONNABEFINE', 'DOOMED', 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
+                "Expected 'YEET', 'EVERYTHINGISGONNABEFINE', 'DOOMED', 'BOWL', 'DEBATE', 'PARADOX', 'SINCE', 'FUNKY', int, float, identifier, '+', '-', '(', '[' or 'FLIP'"
             ))
         return res.success(expr)
 
@@ -714,7 +714,7 @@ class Parser:
             return res.success(VarAssignNode(var_name, expr))
 
         node = res.register(self.bin_op(
-            self.comp_expr, ((TT_KEYWORD, 'AND'), (TT_KEYWORD, 'OR'))))
+            self.comp_expr, ((TT_KEYWORD, 'AND'), (TT_KEYWORD, 'OAR'))))
 
         if res.error:
             return res.failure(InvalidSyntaxError(
@@ -1097,7 +1097,7 @@ class Parser:
         if res.error:
             return res
 
-        if self.current_tok.matches(TT_KEYWORD, 'YEET'):
+        if self.current_tok.matches(TT_KEYWORD, 'STEP'):
             res.register_advancement()
             self.advance()
 
@@ -2113,7 +2113,7 @@ class Interpreter:
             result, error = left.get_comparison_gte(right)
         elif node.op_tok.matches(TT_KEYWORD, 'AND'):
             result, error = left.anded_by(right)
-        elif node.op_tok.matches(TT_KEYWORD, 'OR'):
+        elif node.op_tok.matches(TT_KEYWORD, 'OAR'):
             result, error = left.ored_by(right)
 
         if error:
