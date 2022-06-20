@@ -85,6 +85,29 @@ mass_uwu_print("Hello world", 10)
 | continue           | EVERYTHINGISGONNABEFINE |
 | break              | DOOMED                  |
 
+#### BuiltIn functions and variables
+
+| Name               | Meaning                           |
+| ------------------ | --------------------------------- |
+| VOID               | null                              |
+| HELLYEA            | false                             |
+| HELLNO             | true                              |
+| NERD_NUMBER        | PI number                         |
+| SHOUT              | print                             |
+| NO_INPUT           | asking for input                  |
+| NO_INT             | asking for a number               |
+| GETRIDOFEVERYTHING | clear the console                 |
+| GROE               | clear the console                 |
+| IS_NUMBER          | check if the input is a number    |
+| IS_STRING          | check if the input is a string    |
+| IS_BAG             | check if the input is a list      |
+| IS_FUNKY           | check if the input is a function  |
+| PUSH               | Add something to a list           |
+| POP                | Remove the last element from list |
+| STRETCH            | Adding to lists together          |
+| HOWLONG            | getting the length of list        |
+| UWU                | running a \*.syd script           |
+
 #### Variables
 
 ```javascript
@@ -116,9 +139,7 @@ DEBATE (2+2 == 5) SOWHAT
 	SHOUT("2+2 is equal to 5")
 TOLDYOU (2+2 == 4) SOWHAT
 	SHOUT("2+2 is equal to 4")
-LASTCHANCE SOWHAT
-	SHOUT("WHO CARES?")
-YUMYUM
+LASTCHANCE SHOUT("WHO CARES?")
 ```
 
 ## Author(s)
